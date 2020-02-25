@@ -16,7 +16,7 @@ main = do
 
 loop :: Grid -> IO ()
 loop x = do
-  putStr "Type in the control (WASD): "
+  putStr "\nType in the control (WASD): "
   cmd <- getLine
   out <- gen $ move (act $ head cmd) x
   showScore out
@@ -24,10 +24,8 @@ loop x = do
   loop out
 
 showGrid :: Grid -> IO ()
-showGrid (Grid []      ) = putStrLn ""
-showGrid (Grid (x : xs)) = do
-  putStrLn $ unwords $ map (\y -> if y == 0 then "_" else show y) x
-  showGrid $ Grid xs
+showGrid (Grid x) = mapM_ (putStrLn . f) x where
+  f m = unwords $ map (\y -> if y == 0 then "_" else show y) m
 
 showScore :: Grid -> IO ()
 showScore (Grid x) = do
