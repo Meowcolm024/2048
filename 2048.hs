@@ -2,9 +2,9 @@
 import           Data.List.Split                ( chunksOf )
 import           Data.List                      ( transpose, group )
 import           System.Random                  ( randomRIO )
+import           Control.Monad                  ( replicateM )
 
 data Grid = Grid [[Int]] deriving (Show, Eq)
-
 data Act = Ls | Rs | Us | Ds deriving (Show, Eq)
 
 main :: IO ()
@@ -18,7 +18,7 @@ loop :: Grid -> IO ()
 loop x = do
   putStr "Type in the control (WASD): "
   cmd <- getLine
-  out <- gen $ move (act $ cmd !! 0) x
+  out <- gen $ move (act $ head cmd) x
   showScore out
   showGrid out
   loop out
@@ -55,7 +55,7 @@ move d (Grid x) = case d of
 gen :: Grid -> IO Grid
 gen (Grid g) = do
   rnd <-
-    (sequence . replicate 16)
+    replicateM 16
     $   (\x y z -> x * y * z)
     <$> randomRIO (0, 1)
     <*> randomRIO (0, 1)
@@ -63,8 +63,8 @@ gen (Grid g) = do
   return $ Grid $ chunksOf 4 $ add [] (concat g) (map (* 2) rnd)
 
 add :: [Int] -> [Int] -> [Int] -> [Int]
-add org (x : xs) ly@(y : ys) =
-  if x == 0 then add (org ++ [y]) xs ys else add (org ++ [x]) xs ly
+add org (x : xs) (y : ys) =
+  if x == 0 then add (org ++ [y]) xs ys else add (org ++ [x]) xs ys
 add org _ _ = org
 
 act :: Char -> Act
