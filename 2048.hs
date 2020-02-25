@@ -8,20 +8,15 @@ data Grid = Grid [[Int]] deriving (Show, Eq)
 data Act = Ls | Rs | Us | Ds deriving (Show, Eq)
 
 main :: IO ()
-main = do
-  st <- gen $ Grid $ chunksOf 4 $ replicate 16 0
-  showScore st
-  showGrid st
-  loop st
+main = gen (Grid $ chunksOf 4 $ replicate 16 0) >>= loop
 
 loop :: Grid -> IO ()
 loop x = do
+  showScore x
+  showGrid x
   putStr "\nType in the control (WASD): "
   cmd <- getLine
-  out <- gen $ move (act $ head cmd) x
-  showScore out
-  showGrid out
-  loop out
+  gen (move (act $ head cmd) x) >>= loop
 
 showGrid :: Grid -> IO ()
 showGrid (Grid x) = mapM_ (putStrLn . f) x where

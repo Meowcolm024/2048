@@ -1,6 +1,6 @@
 # 2048
 
-2048 in less than 80 lines, written in *Haskell*
+2048 in less than 70 lines, written in *Haskell*
 
 ## Demo
 
