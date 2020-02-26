@@ -24,10 +24,9 @@ showGrid (Grid x) = mapM_ (putStrLn . f) x where
 
 showScore :: Grid -> IO ()
 showScore (Grid x) = do
-  let t = (sum . map sum) x
-  let m = (maximum . map maximum) x
   putStrLn "--------------------------"
-  putStrLn $ "Total: " ++ show t ++ " Max: " ++ show m
+  putStr   $  "Total: " ++ (show . sum . concat) x 
+  putStrLn $ " Max: "  ++ (show . maximum . concat) x
   putStrLn "--------------------------"
 
 step :: [Int] -> [Int]
@@ -47,18 +46,14 @@ move d (Grid x) = case d of
 
 gen :: Grid -> IO Grid
 gen (Grid g) = do
-  rnd <-
+  r <-
     replicateM 16
-    $   (\x y z -> x * y * z)
+    $   (\x y z -> x * y * z * 2)
     <$> randomRIO (0, 1)
     <*> randomRIO (0, 1)
-    <*> randomRIO (1, 2)
-  return $ Grid $ chunksOf 4 $ add [] (concat g) (map (* 2) rnd)
-
-add :: [Int] -> [Int] -> [Int] -> [Int]
-add org (x : xs) (y : ys) =
-  if x == 0 then add (org ++ [y]) xs ys else add (org ++ [x]) xs ys
-add org _ _ = org
+    <*> randomRIO (0, 2)
+  return $ Grid $ chunksOf 4 
+                $ zipWith (\x y -> if x == 0 then y else x) (concat g) r
 
 act :: Char -> Act
 act x = case x of
