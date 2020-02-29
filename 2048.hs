@@ -32,10 +32,7 @@ showScore (Grid x) = do
 step :: [Int] -> [Int]
 step x = y ++ replicate (4 - length y) 0
  where
-  y = (concatMap merge . concatMap (chunksOf 2) . group . filter (/= 0)) x
-  merge n = case n of
-    [a, b] -> if a == b then [a + b] else [a, b]
-    _      -> n
+  y = map sum . concatMap (chunksOf 2) . group . filter (/= 0) $ x
 
 move :: Act -> Grid -> Grid
 move d (Grid x) = case d of
