@@ -19,19 +19,19 @@ loop x = do
     Nothing -> loop x
 
 showGrid :: Grid -> IO ()
-showGrid = mapM_ (putStrLn . f) where
-  f m = unwords $ map (\y -> if y == 0 then "_" else show y) m
+showGrid = mapM_ (putStrLn . f)
+  where f = unwords . map (\y -> if y == 0 then "_" else show y)
 
 showScore :: Grid -> IO ()
 showScore x = do
   putStrLn "--------------------------"
-  putStr   $  "Total: " ++ (show . sum . concat) x 
-  putStrLn $ " Max: "  ++ (show . maximum . concat) x
+  putStr   $ "Total: " ++ (show . sum . concat) x
+  putStrLn $ " Max: " ++ (show . maximum . concat) x
   putStrLn "--------------------------"
 
 step :: [Int] -> [Int]
-step x = y ++ replicate (4 - length y) 0 where
-  y = map sum . concatMap (chunksOf 2) . group . filter (/= 0) $ x
+step x = y ++ replicate (4 - length y) 0
+  where y = map sum . concatMap (chunksOf 2) . group . filter (/= 0) $ x
 
 move :: Act -> Grid -> Grid
 move d x = case d of
@@ -41,13 +41,12 @@ move d x = case d of
   Ds -> transpose . map (reverse . step . reverse) . transpose $ x
 
 gen :: Grid -> IO Grid
-gen g = do
-  r <- replicateM 16
-    $   (\x y z -> x * y * z * 2)
-    <$> randomRIO (0, 1)
+gen g = chunksOf 4 . zipWith (\x y -> if x == 0 then y else x) (concat g)
+  <$> replicateM 16
+    ((\ x y z -> x * y * z * 2) 
+    <$> randomRIO (0, 1) 
     <*> randomRIO (0, 1)
-    <*> randomRIO (0, 2)
-  return $ chunksOf 4 $ zipWith (\x y -> if x == 0 then y else x) (concat g) r
+    <*> randomRIO (0, 2))
 
 act :: Char -> Maybe Act
 act x = case x of
