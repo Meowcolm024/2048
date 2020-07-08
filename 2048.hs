@@ -3,6 +3,7 @@ import           Data.List.Split                ( chunksOf )
 import           Data.List                      ( transpose, group )
 import           System.Random                  ( randomRIO )
 import           Control.Monad                  ( replicateM )
+import           System.IO                      ( hFlush, stdout )
 
 type Grid = [[Int]]
 data Act = Ls | Rs | Us | Ds deriving (Show, Eq)
@@ -13,7 +14,7 @@ main = gen (chunksOf 4 $ replicate 16 0) >>= loop
 loop :: Grid -> IO ()
 loop x = do
   showScore x >> showGrid x
-  putStr "\nType in the control (WASD): "
+  putStr "\nType in the control (WASD): " >> hFlush stdout
   getLine >>= \y -> let a = act . head $ y ++ " " in case a of
     Just a' -> gen (move a' x) >>= loop
     Nothing -> loop x
@@ -34,11 +35,11 @@ step x = y ++ replicate (4 - length y) 0
   where y = map sum . concatMap (chunksOf 2) . group . filter (/= 0) $ x
 
 move :: Act -> Grid -> Grid
-move d x = case d of
-  Ls -> map step x
-  Rs -> map (reverse . step . reverse) x
-  Us -> transpose . map step . transpose $ x
-  Ds -> transpose . map (reverse . step . reverse) . transpose $ x
+move d = case d of
+  Ls -> map step
+  Rs -> map (reverse . step . reverse)
+  Us -> transpose . map step . transpose
+  Ds -> transpose . map (reverse . step . reverse) . transpose
 
 gen :: Grid -> IO Grid
 gen g = chunksOf 4 . zipWith (\x y -> if x == 0 then y else x) (concat g)
