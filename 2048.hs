@@ -21,14 +21,14 @@ loop x = do
 
 showGrid :: Grid -> IO ()
 showGrid = mapM_ (putStrLn . f)
-  where f = unwords . map (\y -> if y == 0 then "_" else show y)
+  where f = unwords . map (\y -> if y == 0 then "_\t" else show y ++ "\t")
 
 showScore :: Grid -> IO ()
 showScore x = do
-  putStrLn "--------------------------"
+  putStrLn "------------------------------"
   putStr   $ "Total: " ++ (show . sum . concat) x
   putStrLn $ " Max: " ++ (show . maximum . concat) x
-  putStrLn "--------------------------"
+  putStrLn "------------------------------"
 
 step :: [Int] -> [Int]
 step x = y ++ replicate (4 - length y) 0
